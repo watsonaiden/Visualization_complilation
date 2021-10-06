@@ -1,0 +1,132 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Winrates given specific hands preflop",
+  "width": 500,
+  "height": 350,
+  "padding": 5,
+  "data": [
+    {
+      "name": "winrates",
+      "url": "data/winrates.json",
+      "format": {"type": "json"},
+      "transform": [
+        {"type": "fold", "fields": ["one opponent", "five opponents"]}
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color_6",
+      "type": "linear",
+      "domain": {"data": "winrates", "field": "five opponents"},
+      "range": {"scheme": "redyellowgreen"}
+    },
+    {
+      "name": "color_1",
+      "type": "linear",
+      "domain": {"data": "winrates", "field": "one opponent"},
+      "range": {"scheme": "redyellowgreen"}
+    },
+    {
+      "name": "x",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "x_bin"},
+      "range": "width"
+    },
+    {
+      "name": "y",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "y_bin"},
+      "range": "height"
+    },
+    {
+      "name": "y_axis",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "second_card"},
+      "range": "height"
+    },
+    {
+      "name": "x_axis",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "first_card"},
+      "range": "width"
+    }
+  ],
+  "legends": [
+    {
+      "fill": "color_1",
+      "orient": "left",
+      "type": "gradient",
+      "title": "Winrate (%)",
+      "titleAnchor": "end",
+      "titleFontSize": 12,
+      "gradientLength": {"signal": "height - 16"}
+    },
+    {
+      "fill": "color_6",
+      "type": "gradient",
+      "title": "Winrate (%)",
+      "titleFontSize": 12,
+      "titlePadding": 4,
+      "gradientLength": {"signal": "height - 16"}
+    }
+  ],
+  "layout": {"bounds": "flush", "columns": "2", "padding": 50},
+  "marks": [
+    {
+      "type": "group",
+      "from": {
+        "facet": {"name": "facet", "data": "winrates", "groupby": "key"}
+      },
+      "title": {
+        "text": {"signal": "parent.key"},
+        "anchor": "middle",
+        "fontSize": 16,
+        "frame": "group",
+        "offset": 4
+      },
+      "axes": [
+        {"orient": "left", "scale": "y_axis"},
+        {"orient": "bottom", "scale": "x_axis"}
+      ],
+      "encode": {
+        "update": {"width": {"signal": "width"}, "height": {"signal": "height"}}
+      },
+      "marks": [
+        {
+          "type": "rect",
+          "from": {"data": "facet"},
+          "encode": {
+            "enter": {
+              "x": {"scale": "x", "field": "x_bin"},
+              "y": {"scale": "y", "field": "y_bin"},
+              "width": {"scale": "x", "band": 1},
+              "height": {"scale": "y", "band": 1},
+              "fill": [
+                {
+                  "test": "datum['key']=='one opponent'",
+                  "scale": "color_1",
+                  "field": "one opponent"
+                },
+                {"scale": "color_6", "field": "five opponents"}
+              ]
+            }
+          }
+        },
+        {
+          "type": "text",
+          "from": {"data": "facet"},
+          "encode": {
+            "enter": {
+              "x": {"scale": "x", "field": "x_bin", "band": 0.5},
+              "y": {"scale": "y", "field": "y_bin", "band": 0.5},
+              "text": {"field": "Cards"},
+              "tooltip": {"signal": "datum.value+'%'"},
+              "align": {"value": "center"}
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

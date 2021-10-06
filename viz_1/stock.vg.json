@@ -1,0 +1,146 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "A basic line chart example.",
+  "width": 1000,
+  "height": 500,
+  "padding": 5, 
+  "title":{
+	  "text": {"value":"BTC Price"}
+  },
+  "legends": [
+	{
+		"type": "symbol",
+		"title": "Key",
+		"fill": "annotations",
+		"orient": "top-left",
+		"shape":"legend_shape",
+		"labelFontSize": {"value": 20},
+		"symbolSize": {"value":200},
+		"labelLimit": {"value": 0},
+		"titleFontSize": {"value": 20},
+	      "encode": {
+		"symbols": {
+		  "enter": {
+			  "angle": {"value": 90},
+			  "stroke": {"value": "black"}
+		  }
+		}
+	      }
+	}
+  ],
+
+  "data": [
+	  {
+
+	  "name": "bitcoin_normalized",
+	  "format": {"type":"csv", "parse":{"Date":"date:'%Y-%m-%d'"}},
+	  "url": "datasets/BTC_daily.csv"
+	  },
+	  {
+
+	   "name":"bitcoin_tweets",
+	   "format": {"type":"csv", "parse":{"date":"date:'%Y-%m-%d'"}},
+	   "url": "datasets/bitcoin_tweets.csv",
+	   "transform":[{
+		"type": "lookup",
+		"from": "bitcoin_normalized",
+		"key": "Date",
+		"values": ["Close", "Open"],
+		"fields": ["date"],
+		"as": ["bitcoin", "open"],
+		"default": 0
+	   },
+ {
+		"type": "formula",
+		"as": "change_percent",
+		"expr": "((datum.bitcoin - datum.open) / datum.bitcoin)*100"
+	   },
+	   {
+		   "type": "formula",
+		   "as": "positive",
+		   "expr": "datum.change_percent >= 0"
+	   }
+
+	   ]
+	  }
+  ],
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "line:mouseover", "update": "datum"},
+        {"events": "line:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+  {
+   "name": "annotations",
+   "type": "ordinal",
+   "domain": ["Bitcoin Price", "Tweets increased value", "Tweets decreased value"],
+   "range": ["#ffea00", "green", "red"]
+  },
+  {
+    "name":"color",
+	"domain": {"data": "bitcoin_tweets", "field": "positive"},
+	"range": ["red","green"]
+    },
+
+  {
+   "name":"legend_shape",
+   "type": "ordinal",
+   "domain":["Bitcoin Price", "Tweets increased value", "Tweets decreased value"],
+   "range": ["arrow", "circle", "circle"]
+  },
+
+    {
+      "name": "xscale",
+      "type": "utc",
+      "domain": {"data": "bitcoin_normalized", "field": "Date"},
+      "range": "width"
+    },
+    {
+      "name": "yscale",
+      "domain": {"data": "bitcoin_normalized", "field": "Close"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale"},
+    { "orient": "left", "scale": "yscale","title":"Price ($)", "titleFontSize":15}
+  ],
+
+  "marks": [
+    {
+      "type": "line",
+      "from": {"data":"bitcoin_normalized"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "Date"},
+          "y": {"scale": "yscale", "field": "Close"},
+	  "y2": {"scale": "yscale", "value": 0},
+	  "stroke": {"value": "#ffea00"},
+	  "strokeWidth":{"value":3}
+        }
+      }
+      },
+      {
+	"type": "symbol",
+	"from": {"data": "bitcoin_tweets"},
+	"encode":{
+		"enter":{
+			"x":{"scale":"xscale", "field": "date"},
+			"y": {"scale":"yscale", "field": "bitcoin"},
+			
+			"fill":{"scale":"color", "field":"positive"},
+			"size":{"value":200}
+		}
+			
+	}
+	}
+  ]
+}

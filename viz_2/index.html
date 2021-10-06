@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@5"></script>
+	<title>Data visualization (Raster data)</title>
+  <style>
+	.vega-bindings {
+		padding-left: 400px;
+	}
+  </style>
+</head>
+
+<body>  
+<h1 style="text-align:center;">Poker winrate differences again different number of opponents</h1>
+<h3>Hypothesis</h3>
+<p>Middle pairs(66-TT) play far worse against multiple opponents than they do against a single opponent in Holdem Poker</p>
+<p>To fully understand this visual it's important to have some basic understanding of poker rules and terminology. At the start of each round each player is dealt two cards that only they can see, two card hands are represented by their abreviated name Ace - A, Queen - Q etc. These sets of cards can be either suited, two of the same kind, or offsuited, which are denoted in the graphics as <strong style="color:red;">s</strong> or <strong style='color:red;'>o</strong> respectively.An example of a valid hand could be KQs, which represents King-Queen where they both share the same suit. In poker preflop simply means the round of betting before any additional cards are laid out. Your chance of winning displayed below is your preflop win percentage which means with a given hand and no further action what is the likelihood of winning after the 5 cards are dealt.</p>
+
+
+<h2 style="text-align:center;">Preflop Winrate %</h2>
+<div id='poker'></div>
+<div id='differences'> </div>
+  <script>
+    const raster = "hand_winrate.vg.json";
+  	vegaEmbed("#poker", raster)
+      // result.view provides access to the Vega View API
+      .then(result => console.log(result))
+      .catch(console.warn);
+    const raster2 = "difference.vg.json";
+  	vegaEmbed("#differences", raster2)
+      // result.view provides access to the Vega View API
+      .then(result => console.log(result))
+      .catch(console.warn);
+
+
+  </script>
+</body>

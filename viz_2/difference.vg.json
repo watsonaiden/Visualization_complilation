@@ -1,0 +1,120 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Interesting poker statistics",
+  "width": 600,
+  "height": 450,
+  "padding": {"left": 400, "top": 25},
+  "signals": [
+    {
+      "name": "greater",
+      "value": 0,
+      "bind": {
+        "name": "Winrate against one opponent greater than?",
+        "input": "range",
+        "min": 1,
+        "max": 100,
+        "step": 0.5
+      }
+    }
+  ],
+  "data": [
+    {
+      "name": "winrates",
+      "url": "data/winrates.json",
+      "format": {"type": "json"},
+      "transform": [
+        {
+          "type": "formula",
+          "as": "difference",
+          "expr": "ceil(datum['one opponent']-datum['five opponents'])"
+        }
+      ]
+    }
+  ],
+  "title": {
+    "text": "Winrate Difference (One vs. Five opponents)",
+    "anchor": "middle",
+    "fontSize": 20,
+    "offset": 20
+  },
+  "scales": [
+    {
+      "name": "color",
+      "type": "linear",
+      "domain": [15, 50],
+      "range": {"scheme": "blueorange"}
+    },
+    {
+      "name": "x",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "x_bin"},
+      "range": "width"
+    },
+    {
+      "name": "y",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "y_bin"},
+      "range": "height"
+    },
+    {
+      "name": "y_axis",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "second_card"},
+      "range": "height"
+    },
+    {
+      "name": "x_axis",
+      "type": "band",
+      "domain": {"data": "winrates", "field": "first_card"},
+      "range": "width"
+    }
+  ],
+  "axes": [
+    {"orient": "left", "scale": "y_axis"},
+    {"orient": "bottom", "scale": "x_axis"}
+  ],
+  "legends": [
+    {
+      "fill": "color",
+      "type": "gradient",
+      "title": "Difference",
+      "titleFontSize": 12,
+      "titlePadding": 4,
+      "gradientLength": {"signal": "height - 16"}
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "winrates"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "x", "field": "x_bin"},
+          "y": {"scale": "y", "field": "y_bin"},
+          "width": {"scale": "x", "band": 1},
+          "height": {"scale": "y", "band": 1},
+          "fill": {"scale": "color", "field": "difference"}
+        },
+        "update": {
+          "fill": [
+            {"test": "greater>datum['one opponent']", "value": "#adb6ba"},
+            {"scale": "color", "field": "difference"}
+          ]
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "winrates"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "x", "field": "x_bin", "band": 0.5},
+          "y": {"scale": "y", "field": "y_bin", "band": 0.5},
+          "text": {"field": "Cards"},
+          "align": {"value": "center"},
+          "tooltip": {"signal": "datum.difference"}
+        }
+      }
+    }
+  ]
+}

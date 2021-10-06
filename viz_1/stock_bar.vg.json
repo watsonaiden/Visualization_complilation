@@ -1,0 +1,126 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "A basic bar chart example, with value labels shown upon mouse hover.",
+  "width": 1000,
+  "height": 400,
+  "padding": 5,
+  "title":{
+	  "text": {"value": "% Change on Days of Tweets"}
+  },
+  "data": [
+	{
+
+	  "name": "bitcoin_normalized",
+	  "format": {"type":"csv", "parse":{"Date":"date:'%Y-%m-%d'"}},
+	  "url": "datasets/BTC_daily.csv"
+	  },
+	  {
+
+	   "name":"bitcoin_tweets",
+	   "format": {"type":"csv", "parse":{"date":"date:'%Y-%m-%d'"}},
+	   "url": "datasets/bitcoin_tweets.csv",
+	   "transform":[{
+		"type": "lookup",
+		"from": "bitcoin_normalized",
+		"key": "Date",
+		"values": ["Open","Close"],
+		"fields": ["date"],
+		"as": ["open", "close"]
+	   },
+	   {
+		"type": "formula",
+		"as": "change_percent",
+		"expr": "((datum.close - datum.open) / datum.open)*100"
+	   },
+	   {
+		   "type": "formula",
+		   "as": "positive",
+		   "expr": "datum.change_percent >= 0"
+	   }
+	   ]
+	  }
+
+  ],
+
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "bitcoin_tweets", "field": "date"},
+      "range": "width",
+      "padding": 0.05,
+      "reverse": true
+    },
+    {
+      "name": "yscale",
+      "domain": [-4,9],
+      "range": "height",
+      "padding": 10
+    },
+    {
+	"name": "color",
+	"domain": {"data": "bitcoin_tweets", "field": "positive"},
+	"range": ["red","green"]
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale", "title":"Date of Tweet", "formatType":"utc","format":"%d-%m-%Y"},
+    { "orient": "left", "scale": "yscale", "title":"Day % Change"}
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data":"bitcoin_tweets"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "date"},
+	  "fill":{"scale":"color", "field": "positive"},
+          "width": {"scale": "xscale", "band": 1},
+          "y": {"scale": "yscale", "field": "change_percent"},
+          "y2": {"scale": "yscale", "value": 0}
+        },
+        "update": {
+          "fill": {"scale": "color", "field": "positive"}
+        },
+        "hover": {
+          "fill": {"value": "black"}
+
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#333"}
+        },
+        "update": {
+          "x": {"scale": "xscale", "signal": "tooltip.date", "band": 0.5},
+	  "dy": [{"test": "tooltip.positive == true", "value":-2},{"value": 14}],
+	  "limit": {"value":50},
+          "y": {"scale": "yscale", "signal": "tooltip.change_percent"},
+          "text": {"signal": "tooltip.change_percent"},
+          "fillOpacity": [
+            {"test": "datum === tooltip", "value": 0},
+            {"value": 1}
+          ]
+        }
+      }
+    }
+  ]
+}

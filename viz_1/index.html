@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@5"></script>
+	<title>Data visualization (Ordered Pairs)</title>
+</head>
+
+<body>  
+	<h2 style="text-align:center;">Do Elon Musk's tweets about bitcoin artificially inflate its price?</h2>
+	<hr style="height: 20px; background-color: black;">
+  <div id="line"></div>
+  <div style="height: 40px"></div>
+  <div id="bar"></div> 
+  <div>
+  <h4>Sources</h4>
+  <p> Bitcoin price data <a href='https://finance.yahoo.com/quote/BTC-USD?p=BTC-USD&.tsrc=fin-srch'>Yahoo Finance</a></p>
+  <p> Elon Musk Tweets <a href='https://www.kaggle.com/andradaolteanu/all-elon-musks-tweets'>Kaggle Datasets</a></p>
+
+  
+  </div>
+  
+  <script>
+    const line = "stock.vg.json";
+  	vegaEmbed("#line", line)
+      // result.view provides access to the Vega View API
+      .then(result => console.log(result))
+      .catch(console.warn);
+
+
+    const bar = "stock_bar.vg.json";
+  	vegaEmbed("#bar", bar)
+      // result.view provides access to the Vega View API
+      .then(result => console.log(result))
+      .catch(console.warn);
+ 
+  </script>
+</body>
