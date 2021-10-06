@@ -3,7 +3,7 @@
   "description": "Interesting poker statistics",
   "width": 600,
   "height": 450,
-  "padding": {"left": 400, "top": 25},
+  "padding": {"left": 200, "top": 25},
   "signals": [
     {
       "name": "greater",
