@@ -333,8 +333,8 @@
           "type": "symbol",
           "from": {"data": "cities"},
           "encode": {
-            "enter": {"fill": {"field": {"signal": "ColorAs"}, "scale": "color"}, "size": {"value": 25}},
-            "update": {"x": {"field": "x"}, "y": {"field": "y"}}
+            "enter": {"size": {"value": 25}},
+            "update": {"x": {"field": "x"},"fill": {"field": {"signal": "ColorAs"}, "scale": "color"},  "y": {"field": "y"}}
           }
         },
         {
