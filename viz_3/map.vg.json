@@ -1,0 +1,419 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 1250,
+  "height": 600,
+  "autosize": "none",
+  "signals": [
+    {
+      "name": "ColorAs",
+      "value": "staseis",
+      "bind": {
+	 "name": "Focus  ",
+        "input": "select",
+        "options": [
+          "Bronze",
+          "Colonies",
+          "Delian L",
+          "Democracy",
+          "Elevation m",
+          "Grid",
+          "Hellenicity",
+          "In/out",
+          "Koinon",
+          "Polisity",
+          "Proxenoi",
+          "Region #",
+          "Silver",
+          "Victors",
+          "Walls",
+          "area 1",
+          "area 2",
+          "prom 1",
+          "prom 2",
+          "prom 3",
+          "staseis"
+        ]
+      }
+    },
+    {"name": "tx", "update": "chartSize / 2"},
+    {"name": "ty", "update": "height / 2"},
+    {
+      "name": "type",
+      "value": "mercator"
+   },
+    {"name": "chartSize", "value": 600},
+    {
+      "name": "scale",
+      "value": 834
+    },
+   {
+      "name": "center0",
+      "value": 23
+    },
+    {
+      "name": "center1",
+      "value": 40
+    },
+    {
+      "name": "proj_pixel",
+      "update": "[scale('projection', [proj_anchor[0][0], proj_anchor[0][1]]),scale('projection', [proj_anchor[1][0], proj_anchor[1][1]])]"
+    },
+    {
+      "name": "zoom_center",
+      "update": "[(proj_anchor[0][0]+proj_anchor[1][0])/2, (proj_anchor[1][1] +proj_anchor[0][1])/2]"
+    },
+    {
+      "name": "proj_anchor",
+      "value": [[0, 0], [0, 0]],
+      "react": false,
+      "on": [
+        {
+          "events": {"signal": "brushX"},
+          "update": "[invert('projection', [brushX[0], brushY[0]]), invert('projection', [brushX[1], brushY[1]])]"
+        }
+      ]
+    },
+    {
+      "name": "cell",
+      "value": null,
+      "on": [
+        {
+          "events": "@main:mousedown, @world_coastline:mousedown",
+          "update": "group()"
+        },
+        {
+          "events": "@main:mouseup, @world_coastline:mouseup",
+          "update": "!span(brushX) && !span(brushY) ? null : cell"
+        }
+      ]
+    },
+    {
+      "name": "zoom_scale",
+      "value": 900,
+      "on": [
+        {
+          "events": "@zoomed:wheel, @zoomed_world:wheel, symbol:wheel",
+          "update": "zoom_scale * pow(1.001, -1 * event.deltaY * pow(16, event.deltaMode))"
+        }
+      ]
+    },
+    {
+      "name": "brushX",
+      "value": 0,
+      "on": [
+        {
+          "events": "@main:mousedown, @world_coastline:mousedown",
+          "update": "[x(cell), x(cell)]"
+        },
+        {
+          "events": "[@main:mousedown, window:mouseup] > window:mousemove,    [@world_coastline:mousedown, window:mouseup] > window:mousemove",
+          "update": "[brushX[0], clamp(x(cell), 0, chartSize)]"
+        },
+        {
+          "events": {"signal": "delta"},
+          "update": "clampRange([anchorX[0] + delta[0], anchorX[1] + delta[0]], 0, chartSize)"
+        }
+      ]
+    },
+    {
+      "name": "brushY",
+      "value": 0,
+      "on": [
+        {
+          "events": "@main:mousedown, @world_coastline:mousedown",
+          "update": "[y(cell), y(cell)]"
+        },
+        {
+          "events": "[@main:mousedown, window:mouseup] > window:mousemove,[@world_coastline:mousedown, window:mouseup] > window:mousemove",
+          "update": "[brushY[0], clamp(y(cell), 0, height)]"
+        },
+        {
+          "events": {"signal": "delta"},
+          "update": "clampRange([anchorY[0] + delta[1], anchorY[1] + delta[1]], 0, height)"
+        }
+      ]
+    },
+    {
+      "name": "down",
+      "value": [0, 0],
+      "on": [{"events": "@brush:mousedown", "update": "[x(cell), y(cell)]"}]
+    },
+    {
+      "name": "anchorX",
+      "value": null,
+      "on": [{"events": "@brush:mousedown", "update": "slice(brushX)"}]
+    },
+    {
+      "name": "anchorY",
+      "value": null,
+      "on": [{"events": "@brush:mousedown", "update": "slice(brushY)"}]
+    },
+    {
+      "name": "delta",
+      "value": [0, 0],
+      "on": [
+        {
+          "events": "[@brush:mousedown, window:mouseup] > window:mousemove",
+          "update": "[x(cell) - down[0], y(cell) - down[1]]"
+        }
+      ]
+    },
+    {
+      "name": "cursor",
+      "value": "'default'",
+      "on": [
+        {
+          "events": "[@cell:mousedown, window:mouseup] > window:mousemove!",
+          "update": "'nwse-resize'"
+        },
+        {
+          "events": "@brush:mousemove, [@brush:mousedown, window:mouseup] > window:mousemove!",
+          "update": "'move'"
+        },
+        {"events": "@brush:mouseout, window:mouseup", "update": "'default'"}
+      ]
+    },
+    {
+      "name": "cloned",
+      "value": null,
+      "on": [
+        {
+          "events": "@zoomed:mousedown, @zoomed_world:mousedown",
+          "update": "copy('zoom_projection')"
+        }
+      ]
+    },
+    {
+      "name": "start",
+      "value": null,
+      "on": [{"events": "mousedown", "update": "invert(cloned, xy())"}]
+    },
+    {
+      "name": "drag",
+      "value": null,
+      "on": [
+        {
+          "events": "[@zoomed:mousedown, window:mouseup] > window:mousemove, [@zoomed_world:mousedown, window:mouseup] > window:mousemove",
+          "update": "invert(cloned, xy())"
+        }
+      ]
+    },
+    {
+      "name": "delta_zoomed",
+      "value": null,
+      "on": [
+        {
+          "events": {"signal": "drag"},
+          "update": "[drag[0] - start[0], start[1] - drag[1]]"
+        }
+      ]
+    },
+        {
+      "name": "centerY", "value": 40,
+      "on": [{
+        "events": {"signal": "delta_zoomed"},
+        "update": "clamp(centerY + .2*delta_zoomed[1], -60, 60)"
+      },
+      {"events": {"signal":"zoom_center"},
+      "update": "zoom_center[1]"}
+      ]
+    },    
+    {
+      "name": "centerX", "value": 23,
+      "on": [{
+        "events": {"signal": "delta_zoomed"},
+        "update": "clamp(centerX - .2*delta_zoomed[0], -180, 180)"
+      },
+      {"events": {"signal":"zoom_center"},
+      "update": "zoom_center[0]"}
+      ]
+    }
+  ],
+  "projections": [
+    {
+      "name": "projection",
+      "type": {"signal": "type"},
+      "scale": {"signal": "scale"},
+      "center": [{"signal": "center0"}, {"signal": "center1"}],
+      "translate": [{"signal": "tx"}, {"signal": "ty"}]
+    },
+    {
+      "name": "zoom_projection",
+      "type": {"signal": "type"},
+      "scale": {"signal": "zoom_scale"},
+      "center": [{"signal": "centerX"}, {"signal": "centerY"}],
+      "translate": [{"signal": "tx"}, {"signal": "ty"}]
+    }
+  ],
+  "data": [
+    {"name": "world_coastline", "url": "data/world-1km-prunned.json"},
+    {"name": "graticule", "transform": [{"type": "graticule"}]},
+    {
+      "name": "cities",
+      "url": "data/polis_data.csv",
+      "format": {"type": "csv", "delimiter": ","},
+      "transform": [
+        {"type": "filter", "expr": "isNumber(toNumber(datum.Longitude))"},
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": ["Longitude", "Latitude"]
+        },
+        {
+          "type": "geopoint",
+          "projection": "zoom_projection",
+          "fields": ["Longitude", "Latitude"],
+          "as": ["zoom_x", "zoom_y"]
+        }
+      ]
+    } 
+  ],
+  "scales": [
+	  {
+	"name":"color",
+	"type": "linear",
+	"domain":{"data": "cities", "field": {"signal":"ColorAs"}},
+	"range": {"scheme":"yelloworangered"}
+	}
+  ],
+ "legends": [
+    {
+      "title": {"signal": "ColorAs"},
+      "fill": "color",
+      "offset": 20,
+      "titleAnchor": "middle",
+      "titleAlign": "center",
+      "orient":"none",
+      "legendX": {"signal":"width/2 - 75"},
+      "legendY": 550,
+      "direction": "horizontal"
+   }
+  ],
+ "layout": {"bounds": "flush", "columns": 2, "padding": 20},
+  "marks": [
+    {
+      "type": "group",
+      "name": "main",
+      "encode": {
+        "enter": {
+          "width": {"signal": "chartSize"},
+          "height": {"signal": "height-50"},
+          "fill": {"value": "#bfe5f7"},
+          "clip": {"value": true}
+        }
+      },
+      "marks": [
+        {
+          "type": "shape",
+          "from": {"data": "graticule"},
+          "encode": {
+            "update": {
+              "strokeWidth": {"value": 1},
+              "stroke": {"value": "#ddd"},
+              "fill": {"value": null}
+            }
+          },
+          "transform": [{"type": "geoshape", "projection": "projection"}]
+        },
+        {
+          "type": "shape",
+          "name": "world_coastline",
+          "from": {"data": "world_coastline"},
+          "encode": {
+            "update": {
+              "strokeWidth": {"value": 0.5},
+              "stroke": {"value": "#bbb"},
+              "fill": {"value": "#3e3e3d"},
+              "zindex": {"value": 0}
+            }
+          },
+          "transform": [{"type": "geoshape", "projection": "projection"}]
+        },
+        {
+          "type": "symbol",
+          "from": {"data": "cities"},
+          "encode": {
+            "enter": {"fill": {"field": {"signal": "ColorAs"}, "scale": "color"}, "size": {"value": 25}},
+            "update": {"x": {"field": "x"}, "y": {"field": "y"}}
+          }
+        },
+        {
+          "type": "rect",
+          "name": "brush",
+          "encode": {
+            "enter": {"fill": {"value": "#eee"}},
+            "update": {
+              "stroke": {"value": "red"},
+              "opacity": {"value": 0.5},
+              "x": {"signal": "cell ? proj_pixel[0][0] : 0"},
+              "x2": {"signal": "cell ? proj_pixel[1][0] : 0"},
+              "y": {"signal": "cell ? proj_pixel[0][1] : 0"},
+              "y2": {"signal": "cell ? proj_pixel[1][1] : 0"}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "name": "zoomed",
+      "encode": {
+        "enter": {
+          "width": {"signal": "chartSize"},
+          "height": {"signal": "height-50"},
+          "fill": {"value": "#bfe5f7"},
+          "clip": {"value": true}
+        }
+      },
+      "marks": [
+        {
+          "type": "shape",
+          "from": {"data": "graticule"},
+          "encode": {
+            "update": {
+              "strokeWidth": {"value": 1},
+              "stroke": {"value": "#ddd"},
+              "fill": {"value": null}
+            }
+          },
+          "transform": [{"type": "geoshape", "projection": "zoom_projection"}]
+        },
+        {
+          "type": "shape",
+          "name": "zoomed_world",
+          "from": {"data": "world_coastline"},
+          "encode": {
+            "update": {
+              "strokeWidth": {"value": 0.5},
+              "stroke": {"value": "#bbb"},
+              "fill": {"value": "#3e3e3d"},
+              "zindex": {"value": 0}
+            }
+         },
+          "transform": [{"type": "geoshape", "projection": "zoom_projection"}]
+        },
+        {
+          "type": "symbol",
+          "from": {"data": "cities"},
+          "encode": {
+            "enter": {
+              "fill": {"value": "red"},
+              "size": {"value": 50}
+            },
+            "update": {"x": {"field": "zoom_x"}, 
+		       "y": {"field": "zoom_y"},
+
+		      "tooltip": {"signal": "[datum.Name,datum[ColorAs]]"},
+	    		"fill": {"field": {"signal":"ColorAs"}, "scale": "color"},
+			"opacity":[
+				{"test": "datum.Longitude < proj_anchor[0][0] || datum.Longitude > proj_anchor[1][0] || datum.Latitude < proj_anchor[1][1] || datum.Latitude > proj_anchor[0][1]", "value": 0},
+				{"test": "!cell", "value": 0},
+				{"value": 1}
+			]
+	    }
+          }
+        }
+      ]
+    }
+  ]
+  }

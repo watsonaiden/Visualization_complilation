@@ -1,0 +1,22 @@
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+	<h1 style="text-align:center;"> Stasis in Ancient Greece </h1>
+<h3>Hypothesis</h3>
+<p> None of these charecteristics are strongly correlated with the causes of stasis</p>
+  <div id="view"></div>
+
+
+
+  <script>
+    vegaEmbed(
+      '#view',
+      'map.vg.json'
+    ).then(result => console.log(result))
+      .catch(console.warn);
+  
+  </script>
+</body>
