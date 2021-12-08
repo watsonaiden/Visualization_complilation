@@ -26,9 +26,10 @@ fetch(url)
 	generate_histogram(near_impacts);	
 	generate_scatter(near_impacts);
   });
+// cors error preventing getting api code
 local_all_url = 'all_data.txt'
 all_url = 'https://ssd-api.jpl.nasa.gov/cad.api?date-min=1900-01-01&date-max=2021-01-01'
-fetch(all_url)
+fetch(local_all_url)
   .then((response) => response.json())
   .then((json) => {
 	generate_heatmap(json['data'])
