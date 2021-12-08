@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Viz 5</title>
+  </head>
+</body>
+<h3>How many hazerdous astroids are coming near earth?</h3>
+<p>*note* in miss distance vs. velocity chart, size of dot indicates size of astroid. The color red indicates that NASA has catagorized it as potentially hazerdous</p>
+<div style='display:flex; width:1000px;' id='parent'>
+<div style='flex: 1' id='histogram'></div>
+<div style='flex: 1' id='scatterplot'></div>
+</div>
+<div id='heatmap'></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src='index.js'></script>
+
+<p> source - https://api.nasa.gov/
+<br>
+	https://ssd-api.jpl.nasa.gov/doc/cad.html
+</p>
+  </body>
+</html>
